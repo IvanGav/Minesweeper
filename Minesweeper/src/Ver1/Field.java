@@ -18,13 +18,13 @@ public class Field {
     private void setField() {
         for(int h = 0; h < field.length; h++)
             for (int w = 0; w < field[0].length; w++)
-                field[h][w] = new Square(Square.TILE_EMPTY);
+                field[h][w] = new Square(TileType.EMPTY);
         int bombsLeft = bombs;
         while(bombsLeft > 0) {
             int ry = (int) (Math.random() * field.length);
             int rx = (int) (Math.random() * field[0].length);
-            if (field[ry][rx].tile == Square.TILE_EMPTY) {
-                field[ry][rx].tile = Square.TILE_BOMB;
+            if (field[ry][rx].tile == TileType.EMPTY) {
+                field[ry][rx].tile = TileType.BOMB;
                 bombsLeft--;
             }
         }
@@ -34,7 +34,7 @@ public class Field {
     private void setNumbers() {
         for (int h = 0; h < field.length; h++) {
             for (int w = 0; w < field[0].length; w++) {
-                if(field[h][w].tile == Square.TILE_BOMB) {
+                if(field[h][w].tile == TileType.BOMB) {
                     incrementNeighborBombs(h-1,w);
                     incrementNeighborBombs(h-1,w+1);
                     incrementNeighborBombs(h,w+1);
@@ -84,7 +84,7 @@ public class Field {
 
     //reveal the tile at (w,h). Return false if it is flagged, true otherwise; if safe, reveal nearby tiles
     public boolean reveal(int h, int w) {
-        if(field[h][w].state == Square.STATE_FLAGGED) return false;
+        if(field[h][w].state == State.FLAGGED) return false;
         if(
                 field[h][w].reveal()
         ) lost = true;
@@ -104,19 +104,19 @@ public class Field {
     //reveal a tile only if empty
     private void chainReveal(int h, int w) {
         if(h < 0 || w < 0 || h >= field.length || w >= field[0].length) return;
-        if(field[h][w].state == Square.STATE_HIDDEN && field[h][w].tile == Square.TILE_EMPTY) {
+        if(field[h][w].state == State.HIDDEN && field[h][w].tile == TileType.EMPTY) {
             reveal(h,w);
         }
     }
 
     //toggle flag on a tile at (w,h). Return false if it was already revealed, true otherwise
     public boolean toggleFlag(int h, int w) {
-        if(field[h][w].state == Square.STATE_REVEALED) return false;
-        if(field[h][w].state == Square.STATE_HIDDEN) {
-            field[h][w].state = Square.STATE_FLAGGED;
+        if(field[h][w].state == State.REVEALED) return false;
+        if(field[h][w].state == State.HIDDEN) {
+            field[h][w].state = State.FLAGGED;
             flagged++;
         } else {
-            field[h][w].state = Square.STATE_HIDDEN;
+            field[h][w].state = State.HIDDEN;
             flagged--;
         }
         return true;
@@ -135,8 +135,8 @@ public class Field {
     public boolean isWon() {
         for(Square[] row: field) {
             for(Square s: row) {
-                if(s.state == Square.STATE_HIDDEN) return false;
-                if(s.state == Square.STATE_FLAGGED && s.tile == Square.TILE_EMPTY) return false;
+                if(s.state == State.HIDDEN) return false;
+                if(s.state == State.FLAGGED && s.tile == TileType.EMPTY) return false;
             }
         }
         return true;
